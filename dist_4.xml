@@ -4,15 +4,15 @@
 		<attribute name="configClass" />
 		<sequential>
 			<!--MyApp 의 코드 부분 갈아치기 : 무식하게 sed로. 갈아친 파일은 MyApp_temp.java로 출력 -->
-				<exec executable="sed" output="MyApp_temp.java">
-					<arg value="s/\(public static final Config config\)\(.*\)/\1 = new kr.pe.kingori.sample.@{configClass}();/" />
-					<arg value="src/kr/pe/kingori/sample/MyApp.java" />
-				</exec>
-				<!--MyApp_temp.java 를 원래의 파일에 엎어침 -->
-				<move file="MyApp_temp.java" tofile="src\kr\pe\kingori\sample\MyApp.java" overwrite="true" />
-				<!-- build.xml 의 release 타겟 호출 -->
+			<exec executable="sed" output="MyApp_temp.java">
+				<arg value="s/\(public static final Config config\)\(.*\)/\1 = new sample.android.ant.@{configClass}();/" />
+				<arg value="src/sample/android/ant/MyApp.java" />
+			</exec>
+			<!--MyApp_temp.java 를 원래의 파일에 엎어침 -->
+			<move file="MyApp_temp.java" tofile="src/sample/android/ant/MyApp.java" overwrite="true" />
+			<!-- build.xml 의 release 타겟 호출 -->
 				<ant antfile="build.xml" target="release" />
-				<move file="bin/and_ant_prj-release.apk" tofile="dist/@{apkName}_${version}.apk" overwrite="true" />			
+				<move file="bin/ant_sample-release.apk" tofile="dist/@{apkName}_${version}.apk" overwrite="true" />			
 		</sequential>
 	</macrodef>
   <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="${ant.library.dir}/xmltask.jar" />
