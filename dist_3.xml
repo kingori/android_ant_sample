@@ -1,0 +1,40 @@
+<project name="android_ant_sample" default="all">
+	<macrodef name="gen_apk">
+		<attribute name="apkName" />
+		<attribute name="configClass" />
+		<sequential>
+			<!--MyApp 의 코드 부분 갈아치기 : 무식하게 sed로. 갈아친 파일은 MyApp_temp.java로 출력 -->
+			<exec executable="sed" output="MyApp_temp.java">
+				<arg value="s/\(public static final Config config\)\(.*\)/\1 = new sample.android.ant.@{configClass}();/" />
+				<arg value="src/sample/android/ant/MyApp.java" />
+			</exec>
+				<!--MyApp_temp.java 를 원래의 파일에 엎어침 -->
+			<move file="MyApp_temp.java" tofile="src/sample/android/ant/MyApp.java" overwrite="true" />
+				<!-- build.xml 의 release 타겟 호출 -->
+				<ant antfile="build.xml" target="release" />
+				<move file="bin/ant_sample-release.apk" tofile="dist/@{apkName}_${version}.apk" overwrite="true" />			
+		</sequential>
+	</macrodef>
+  <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="${ant.library.dir}/xmltask.jar" />
+
+	<target name="all" depends="prepare,set_version,dev,real" description="전체 빌드 다 만들기">
+		<!-- 실제 할 일은 없다 -->
+	</target>
+	<target name="prepare" description="빌드 출력 디렉터리 만들기">
+		<mkdir dir="dist" />
+	</target>
+  <target name="set_version" description="버전 번호 읽어오기">
+		<xmltask source="AndroidManifest.xml">
+    	<copy path="/manifest/@*[local-name()='versionName']" property="version"/>
+     </xmltask>
+     <echo message="versionName:${version}"/>
+  </target>
+
+	<target name="dev" description="개발 빌드 만들기">
+		<gen_apk apkname="and_ant_prj_dev" configclass="ConfigDev"/>
+	</target>
+
+	<target name="real" description="실서버 빌드 만들기">
+		<gen_apk apkname="and_ant_prj_real" configclass="ConfigReal"/>
+	</target>
+</project>
